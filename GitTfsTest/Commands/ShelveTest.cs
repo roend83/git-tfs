@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Rhino.Mocks;
 using Rhino.Mocks.Constraints;
@@ -150,6 +151,7 @@ namespace Sep.Git.Tfs.Test.Commands
             public string GetPathInGitRepo(string tfsPath){return tfsPath;}
             public void Fetch(){}
             public void Shelve(string shelvesetName, string treeish, TfsChangesetInfo parentChangeset){}
+            public void Checkin(string treeish, TfsChangesetInfo parentChangeset){}
         }
     }
 }

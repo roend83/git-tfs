@@ -44,6 +44,25 @@ namespace Sep.Git.Tfs.Core
             }
         }
 
+        public void Checkin()
+        {
+            var pendingChanges = _workspace.GetPendingChanges();
+
+            if (pendingChanges.Length == 0)
+            {
+                _stdout.WriteLine(" nothing to shelve");
+            }
+            else
+            {
+                var workItemInfo = GetWorkItemInfos();
+                var result = _workspace.EvaluateCheckin(CheckinEvaluationOptions.All, pendingChanges,
+                                                        pendingChanges, _checkinOptions.CheckinComment, null,
+                                                        workItemInfo);
+                throw new Exception("Not ready to actually check in!!");
+                //_workspace.CheckIn(pendingChanges, _checkinOptions.CheckinComment, null, workItemInfo, DoPolicyOverrideIfReasonWasGivenAndForceIsSet(result));
+            }
+        }
+
         public string GetLocalPath(string path)
         {
             return Path.Combine(_localDirectory, path);

@@ -7,6 +7,8 @@ namespace Sep.Git.Tfs.Core
         /// </summary>
         void Shelve(string shelvesetName);
 
+        void Checkin();
+
         string GetLocalPath(string path);
         void Add(string path);
         void Edit(string path);
