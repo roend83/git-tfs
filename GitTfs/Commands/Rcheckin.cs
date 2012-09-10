@@ -19,6 +19,7 @@ namespace Sep.Git.Tfs.Commands
         private readonly TfsWriter _writer;
 
         private bool Quick { get; set; }
+        private bool WorkItemRequired { get; set; }
 
         public Rcheckin(TextWriter stdout, CheckinOptions checkinOptions, TfsWriter writer)
         {
@@ -32,10 +33,16 @@ namespace Sep.Git.Tfs.Commands
             get
             {
                 return new OptionSet
-                {
-                    { "no-rebase|quick", "omit rebases (faster)\nNote: this can lead to problems if someone checks something in while the command is running.",
-                        v => Quick = v != null },
-                }.Merge(_checkinOptions.OptionSet);
+                           {
+                               {
+                                   "no-rebase|quick", "omit rebases (faster)\nNote: this can lead to problems if someone checks something in while the command is running.",
+                                   v => Quick = v != null
+                               },
+                               {
+                                   "work-item-required", "Stops the rcheckin process if a commit is found that does not have an associated work item",
+                                   v => WorkItemRequired = v != null
+                               },
+                           }.Merge(_checkinOptions.OptionSet);
             }
         }
 
@@ -64,8 +71,15 @@ namespace Sep.Git.Tfs.Commands
                             break;
                     }
                 }
-                return Sep.Git.Tfs.GitTfsConstants.TfsWorkItemRegex.Replace(commitMessage, "").Trim(' ', '\r', '\n');
+
+                commitMessage = Sep.Git.Tfs.GitTfsConstants.TfsWorkItemRegex.Replace(commitMessage, "").Trim(' ', '\r', '\n');
             }
+
+            if (WorkItemRequired && !_checkinOptions.WorkItemsToAssociate.Any() && !_checkinOptions.WorkItemsToResolve.Any())
+            {
+                throw new GitTfsException(string.Format("error: The following commit is not associated with any TFS work items:{0}{1}", Environment.NewLine, commitMessage));
+            }
+
             return commitMessage;
         }
 
